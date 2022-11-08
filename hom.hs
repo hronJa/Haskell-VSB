@@ -49,7 +49,19 @@ max' ((x,y):rest) inp
 
 
     
-
+pp::Result->IO()
+pp x = putStr(concat(map(++"\n")x))
+sampleInput::Result
+sampleInput ="
+"     XXXXX"
+"     X   X"
+"     X   X"
+"     X   X"
+"XXXXXXXXXX"
+"X   X     "
+"X   X     "
+"X   X     "
+"XXXXX     "
 
 
 
