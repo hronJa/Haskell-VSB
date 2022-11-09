@@ -8,26 +8,26 @@ pp x = putStr (concat (map (++"\n") x))
 draw::[(Char,Int)]->Result 
 draw input = do
   let dimensions = calculateDimensions input
-  --print dimensions
-  -- TODO: better rows/cols, [x0,y0] calculation
   let cols =  ((dimensions !! 0) + (dimensions !! 2))
   --print cols
   let rows =  ((dimensions !! 1) + (dimensions !! 3))
-  --print rows
-  --let cols = 20
-  --let rows = 20
+  
   let x0 = div cols 2
   let y0 = div rows 2
   let array = allocate rows cols
   let origin = setAt (array!!y0) x0 '+'
   let withOrigin = replaceRow array y0 origin
+
   --print array
   let updated = markAllPaths withOrigin x0 y0 input
   let skipPrefix =  foldr min cols ( map getSpacePrefixLength updated)
   let skipSuffix =  foldr min cols ( map getSpacePrefixLength (map reverse updated))
  -- print skip
   --show skip)
- print printResult updated skipPrefix skipSuffix
+ -- printResult updated skipPrefix skipSuffix
+  let withoutEmptyRows = removeEmptyRows updated
+  map (removeEmptyCols skipPrefix skipSuffix) withoutEmptyRows
+  --  print printResult updated skipPrefix skipSuffix
 
 markAllPaths::Array->Int->Int->[(Char,Int)]->Array
 markAllPaths array x y [] = array
@@ -49,7 +49,6 @@ getNewStartPoint x y direction length =
 markPath::Array->Int->Int->Char->Int->Array
 markPath array x y direction 0 = array
 markPath array x y direction length = do 
-  --let updated = trace ("[" ++ (show x) ++ "," ++ (show y) ++ "]") (setAt (array!!y) x 'X')
   let updated = setAt (array!!y) x 'X'
   let replaced = replaceRow array y updated
   let newLength = length - 1
@@ -67,18 +66,13 @@ getDirectionPath::Char->(Char,Int)->Int
 getDirectionPath requiredDirection (direction, step)
             | direction == requiredDirection = step
             | otherwise = 1
-            -- | otherwise = 0
+        
 
 processInput::[(Char,Int)]->Char->Int
 processInput input dir =  sum (map (getDirectionPath dir ) input)
 
 calculateDimensions::[(Char,Int)]->[Int]
 calculateDimensions input = map (processInput input) ['l','u','r','d']
-
--- neni potreba diky [1,2,3] !! 1
---getAt::[Int]->Int->Int
--- split at vraci  seznam seznamu, last vezme posledni seznam
---getAt arrInput index = head ( getSecondElementFromTuple (splitAt index arrInput))
 
 getSecondElementFromTuple::(a,b)->b 
 getSecondElementFromTuple (a,b) = b
@@ -95,10 +89,6 @@ getSpacePrefixLength (first:rest)
 
 type Array = [[Char]]
 
---setAt::[Int]->Int->Int->[Int]
---setAt input index newValue = 
---  let split = splitAt index input in 
---  (getFirstElementFromTuple split) ++ [newValue] ++ (tail (getSecondElementFromTuple split))
 setAt::[Char]->Int->Char->[Char]
 setAt input index newValue = 
   let split = splitAt index input in 
@@ -112,38 +102,28 @@ generateRow::Int->[Char]
 generateRow 0 = []
 generateRow length = [' '] ++ (generateRow (length - 1))
 
-printResult::[[Char]]->Int->Int->IO ()
-printResult [] _ _ = do 
-  return ()
-printResult (x:xs) skipPrefix skipSuffix = do 
+printResult0::[[Char]]->Int->Int->Result
+printResult0 [] _ _ = do 
+  return []
+printResult0 (x:xs) skipPrefix skipSuffix = do 
   let withoutPrefix = drop skipPrefix x
   let withoutSuffix = reverse (drop skipSuffix (reverse withoutPrefix))
-  if elem 'X' x then print (withoutSuffix) else pure ()
-  printResult xs skipPrefix skipSuffix
+  if elem 'X' x then withoutSuffix else []
+  printResult0 xs skipPrefix skipSuffix
        
--- getDimensions
--- allocate
--- foreach step
---   set path
--- reduce array (needed?)
--- print result
 
---main = do 
-  --let array = allocate 5 5
-  --print "Empty"
-  --printResult array
-  --print (array !! 0)
-  --let first = (array !! 0):
-  --let updated = setAt first 0 'X'
-  --print (setAt updated 1 'X')
-  --draw [('u',5),('r',5),('d',5),('l',10),('d',5),('r',5),('u',5)]
  --draw [('u',5),('r',5),('d',5),('l',10),('d',5),('r',5),('u',5)]
 
-  -- draw [('r', 4),('l', 3),('d',2),('l', 3),('d',2),('l', 3)]
-  --draw [('r',2),('d',8),('l',5),('u',4)]
-  --print "Result"
-  --printResult array
+  
+pp2 :: Result -> IO ()
+pp2 x = putStr (concat (map (++"\n") x))
 
+removeEmptyRows::[[Char]]->Result
+removeEmptyRows input = [n| n<-input, (elem 'X' n) ]
 
-
+removeEmptyCols::Int->Int->[Char]->[Char]
+removeEmptyCols skipPrefix skipSuffix input = do 
+  let withoutPrefix = drop skipPrefix input
+  reverse (drop skipSuffix (reverse withoutPrefix))
+ 
 
