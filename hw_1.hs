@@ -116,4 +116,3 @@ removeEmptyCols skipPrefix skipSuffix input = do
  
 -- testing
 -- pp(draw [('u',5),('r',5),('d',5),('l',10),('d',5),('r',5),('u',5)]) 
--- pp(draw [('u',5),('r',5),('d',5),('l',10),('d',5),('r',5),('u',5)]) 

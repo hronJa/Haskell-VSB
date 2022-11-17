@@ -31,16 +31,16 @@ main = do
     let list = [1,2,3]
     print(aver list)
 
-countIn::Int->[Int]->Int
-countIn searchNumber []=0
-countIn searchNumber (first:rest) = 
-    if first == searchNumber
-        then 1 + countIn rest 
-    else countIn searchNumber rest
+--countIn::Int->[Int]->Int
+--countIn searchNumber []=0
+--countIn searchNumber (first:rest) = 
+  --  if first == searchNumber
+    --    then 1 + countIn rest 
+   -- else countIn searchNumber rest
 
 sumPos::[Int]->Int
-sumPos numb [] = 0
-sumPos numb (first:rest) =
+sumPos  [] = 0
+sumPos  (first:rest) =
     if first > 0
         then first + sumPos rest
     else sumPos rest
